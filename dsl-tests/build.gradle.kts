@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    testImplementation(project(":lib"))
+    testImplementation(project(":dsl"))
 }
