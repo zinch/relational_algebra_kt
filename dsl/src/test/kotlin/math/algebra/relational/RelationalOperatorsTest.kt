@@ -6,7 +6,7 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import math.algebra.relational.dsl.relation
 
-class RelationalAlgebraTest : DescribeSpec({
+class RelationalOperatorsTest : DescribeSpec({
     describe("Selection operator") {
         describe("with a 'College' relation") {
             it("selects all colleges") {

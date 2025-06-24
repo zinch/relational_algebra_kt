@@ -4,12 +4,7 @@ import math.algebra.relational.dsl.relation
 
 val studentRelation = relation {
     name("Student")
-    attributes {
-        name("sID")
-        name("sName")
-        name("GPA")
-        name("HS")
-    }
+    attributes("sID", "sName", "GPA", "HS")
     tuples {
         tuple(1, "Sarah Anderson", 3.8, 2100)
         tuple(2, "Michael Chen", 3.9, 1000)
@@ -22,11 +17,7 @@ val studentRelation = relation {
 
 val collegeRelation = relation {
     name("College")
-    attributes {
-        name("cName")
-        name("state")
-        name("enr")
-    }
+    attributes("cName", "state", "enr")
     tuples {
         tuple("Stanford University", "CA", 17249)
         tuple("University of California Berkeley", "CA", 45057)
@@ -40,12 +31,7 @@ val collegeRelation = relation {
 
 val applyRelation = relation {
     name("Apply")
-    attributes {
-        name("sID")
-        name("cName")
-        name("major")
-        name("dec")
-    }
+    attributes("sID", "cName", "major", "dec")
     tuples {
         tuple(1, "Stanford University", "CS", 'Y')
         tuple(2, "Stanford University", "CS", 'R')

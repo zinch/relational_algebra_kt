@@ -20,10 +20,8 @@ class RelationBuilder {
         name = relationName
     }
 
-    fun attributes(block: AttributesBuilder.() -> Unit) {
-        val attributesBuilder = AttributesBuilder()
-        attributesBuilder.block()
-        attributes.addAll(attributesBuilder.build())
+    fun attributes(vararg attributeNames: String) {
+        attributes.addAll(attributeNames)
     }
 
     fun tuples(block: TuplesBuilder.() -> Unit) {

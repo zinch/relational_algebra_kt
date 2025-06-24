@@ -11,12 +11,7 @@ import math.algebra.relational.dsl.relation
 class RelationalAlgebraDslTest : DescribeSpec({
     val studentRelation = relation {
         name("Student")
-        attributes {
-            name("sID")
-            name("sName")
-            name("GPA")
-            name("HS")
-        }
+        attributes("sID", "sName", "GPA", "HS")
         tuples {
             tuple(1, "Sarah Anderson", 3.8, 2100)
             tuple(2, "Michael Chen", 3.9, 1000)
@@ -29,12 +24,7 @@ class RelationalAlgebraDslTest : DescribeSpec({
 
     val applyRelation = relation {
         name("Apply")
-        attributes {
-            name("sID")
-            name("cName")
-            name("major")
-            name("dec")
-        }
+        attributes("sID", "cName", "major", "dec")
         tuples {
             tuple(1, "Stanford University", "CS", 'Y')
             tuple(2, "Stanford University", "CS", 'R')
