@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/buildSrc/Relational_Algebra_DSL.buildSrc.main.iml" filepath="$PROJECT_DIR$/.idea/modules/buildSrc/Relational_Algebra_DSL.buildSrc.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib-tests/Relational_Algebra_DSL.lib-tests.test.iml" filepath="$PROJECT_DIR$/.idea/modules/lib-tests/Relational_Algebra_DSL.lib-tests.test.iml" />
+    </modules>
+  </component>
+</project>

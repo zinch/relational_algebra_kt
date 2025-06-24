@@ -211,27 +211,4 @@ class RelationalAlgebraTest : DescribeSpec({
             )
         }
     }
-
-    describe("Combination of operators") {
-        it("finds names and GPA of students with HS>1000 who applied to CS and were rejected") {
-            val rel = studentRelation.cross(applyRelation).select {
-                attribute("Student.sID") equal attribute("Apply.sID") and
-                        (attribute("HS") gt 1000) and
-                        (attribute("major") equal "CS") and
-                        (attribute("dec") equal 'R')
-            }.project {
-                attributes {
-                    name("sName")
-                    name("GPA")
-                }
-            }
-
-            rel.name shouldBe "π_{sName,GPA}(σ_{(((Student.sID=Apply.sID)∧(HS>1000))∧(major=CS))∧(dec=R)}(Student × Apply))"
-            rel.tuples should containExactly(
-                listOf(
-                    Tuple("James Wilson", 4.0)
-                )
-            )
-        }
-    }
 })

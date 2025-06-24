@@ -4,3 +4,4 @@ plugins {
 
 rootProject.name = "Relational Algebra DSL"
 include("lib")
+include("lib-tests")
