@@ -43,10 +43,7 @@ class RelationalAlgebraDslTest : DescribeSpec({
                         (attribute("major") equal "CS") and
                         (attribute("dec") equal 'R')
             }.project {
-                attributes {
-                    name("sName")
-                    name("GPA")
-                }
+                attributes("sName", "GPA")
             }
 
             rel.name shouldBe "π_{sName,GPA}(σ_{(((Student.sID=Apply.sID)∧(HS>1000))∧(major=CS))∧(dec=R)}(Student × Apply))"

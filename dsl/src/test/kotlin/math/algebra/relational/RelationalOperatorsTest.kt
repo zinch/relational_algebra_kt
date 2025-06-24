@@ -93,9 +93,7 @@ class RelationalOperatorsTest : DescribeSpec({
             it("returns all student IDs") {
                 // when
                 val relationWithStudentIds = applyRelation.project {
-                    attributes {
-                        name("sID")
-                    }
+                    attributes("sID")
                 }
 
                 // then
@@ -116,9 +114,7 @@ class RelationalOperatorsTest : DescribeSpec({
             it("returns unique college names") {
                 // when
                 val relationWithUniqueCollegeNames = applyRelation.project {
-                    attributes {
-                        name("cName")
-                    }
+                    attributes("cName")
                 }
 
                 // then
@@ -136,10 +132,7 @@ class RelationalOperatorsTest : DescribeSpec({
             it("returns unique tuples of major and decision") {
                 // when
                 val relationWithMajorAndDecision = applyRelation.project {
-                    attributes {
-                        name("major")
-                        name("dec")
-                    }
+                    attributes("major", "dec")
                 }
 
                 // then

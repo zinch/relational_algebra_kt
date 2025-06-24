@@ -2,8 +2,6 @@ package math.algebra.relational.dsl
 
 import math.algebra.relational.Relation
 import math.algebra.relational.Tuple
-import kotlin.collections.map
-import kotlin.collections.toList
 
 fun relation(block: RelationBuilder.() -> Unit): Relation {
     val builder = RelationBuilder()
@@ -31,7 +29,7 @@ class RelationBuilder {
     }
 
     fun build(): Relation {
-        return Relation(name,attributes.toList(), tuples.map { Tuple(it) }.toList())
+        return Relation(name, attributes.toList(), tuples.map { Tuple(it) }.toList())
     }
 }
 
@@ -54,23 +52,7 @@ class ProjectionBuilder {
         return attributes
     }
 
-    fun attributes(block: AttributesBuilder.() -> Unit) {
-        val attributesBuilder = AttributesBuilder()
-        attributesBuilder.block()
-        attributes.addAll(attributesBuilder.build())
-    }
-}
-
-class AttributesBuilder {
-    private val attributesList = mutableListOf<String>()
-    private var attributeIndex = 0
-
-    fun name(attribute: String) {
-        attributesList.add(attribute)
-        attributeIndex++
-    }
-
-    fun build(): List<String> {
-        return attributesList
+    fun attributes(vararg attributeNames: String) {
+        attributes.addAll(attributeNames)
     }
 }
