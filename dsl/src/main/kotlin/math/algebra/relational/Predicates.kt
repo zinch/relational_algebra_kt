@@ -11,7 +11,7 @@ data class Attribute(val name: String) {
     override fun toString() = name
 }
 
-interface Predicate {
+sealed interface Predicate {
     infix fun and(other: Predicate): Predicate {
         return And(this, other)
     }
