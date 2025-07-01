@@ -28,15 +28,15 @@ class RelationalAlgebraDslTest : DescribeSpec({
         tuples {
             tuple(1, "Stanford University", "CS", 'Y')
             tuple(2, "Stanford University", "CS", 'R')
-            tuple(3, "University of California Berkeley", "Statistics", 'Y')
-            tuple(5, "University of California Berkeley", "Fluid Mechanics", 'Y')
-            tuple(8, "University of California Berkeley", "English", 'R')
+            tuple(3, "University of California, Berkeley", "Statistics", 'Y')
+            tuple(5, "University of California, Berkeley", "Fluid Mechanics", 'Y')
+            tuple(8, "University of California, Berkeley", "English", 'R')
             tuple(13, "University of Texas at Austin", "CS", 'R')
         }
     }
 
     describe("Combination of operators") {
-        it("finds names and GPA of students with HS>1000 who applied to CS and were rejected") {
+        it("finds names and GPA of students with HS>1000 who applied to CS and were rejected using cross product") {
             val rel = studentRelation.cross(applyRelation).select {
                 attribute("Student.sID") equal attribute("Apply.sID") and
                         (attribute("HS") gt 1000) and

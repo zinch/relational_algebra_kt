@@ -76,6 +76,47 @@ class Relation(
         return Relation(newName, newAttributes, newTuples)
     }
 
+    fun naturalJoin(relation: Relation): Relation {
+        val newName = "$name ⋈ ${relation.name}"
+        val firstRelationAttributes = attributes.toSet()
+        val secondRelationAttributes = relation.attributes.toSet()
+
+        val commonAttributes = firstRelationAttributes.intersect(secondRelationAttributes)
+        val secondRelationAttributeIndices = secondRelationAttributes
+            .subtract(commonAttributes)
+            .map { relation.getAttributeIndex(it) }
+
+        val newTuples = mutableListOf<Tuple>()
+        for (firstTuple in tuples) {
+            for (secondTuple in relation.tuples) {
+                val isMatching: Boolean = commonAttributes.all {
+                    val firstIdx = getAttributeIndex(it)
+                    val secondIdx = relation.getAttributeIndex(it)
+                    firstTuple[firstIdx] == secondTuple[secondIdx]
+                }
+                if (isMatching) {
+                    val secondTupleValues = secondRelationAttributeIndices.map { i -> secondTuple[i] }
+                    newTuples.add(Tuple(firstTuple.values + secondTupleValues))
+                }
+            }
+        }
+
+//        val newTuples = tuples.flatMap { firstTuple ->
+//            relation.tuples
+//                .filter { secondTuple ->
+//                    commonAttributes.all {
+//                        val firstIdx = getAttributeIndex(it)
+//                        val secondIdx = relation.getAttributeIndex(it)
+//                        return firstTuple[firstIdx] == secondTuple[secondIdx]
+//                    }
+//                }
+//                .map { secondTuple ->
+//                    Tuple(firstTuple.values + secondTuple.values)
+//                }
+//        }
+        return Relation(newName, (firstRelationAttributes + secondRelationAttributes).toList(), newTuples)
+    }
+
     fun getAttributeIndex(attrName: String): Int {
         val attrIdx = attributes.indexOf(attrName)
         if (attrIdx == -1) {

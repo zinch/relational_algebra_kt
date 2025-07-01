@@ -31,7 +31,7 @@ class RelationalOperatorsTest : DescribeSpec({
                 relation.tuples should containExactly(
                     listOf(
                         Tuple("Stanford University", "CA", 17249),
-                        Tuple("University of California Berkeley", "CA", 45057)
+                        Tuple("University of California, Berkeley", "CA", 45057)
                     )
                 )
             }
@@ -81,7 +81,7 @@ class RelationalOperatorsTest : DescribeSpec({
                 relation.name shouldBe "σ_{(state=CA)∧((enr>40000)∨(enr=40000))}(College)"
                 relation.tuples should containExactly(
                     listOf(
-                        Tuple("University of California Berkeley", "CA", 45057)
+                        Tuple("University of California, Berkeley", "CA", 45057)
                     )
                 )
             }
@@ -123,7 +123,7 @@ class RelationalOperatorsTest : DescribeSpec({
                 relationWithUniqueCollegeNames.tuples should containExactly(
                     listOf(
                         Tuple("Stanford University"),
-                        Tuple("University of California Berkeley"),
+                        Tuple("University of California, Berkeley"),
                         Tuple("University of Texas at Austin"),
                     )
                 )
@@ -151,7 +151,7 @@ class RelationalOperatorsTest : DescribeSpec({
         }
     }
 
-    describe("Cross-product operator") {
+    describe("Cross product operator") {
         val crossProduct = studentRelation.cross(applyRelation)
 
         it("prefixes same attributes name with relation name") {
@@ -166,40 +166,65 @@ class RelationalOperatorsTest : DescribeSpec({
                 listOf(
                     Tuple(1, "Sarah Anderson", 3.8, 2100, 1, "Stanford University", "CS", 'Y'),
                     Tuple(1, "Sarah Anderson", 3.8, 2100, 2, "Stanford University", "CS", 'R'),
-                    Tuple(1, "Sarah Anderson", 3.8, 2100, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(1, "Sarah Anderson", 3.8, 2100, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(1, "Sarah Anderson", 3.8, 2100, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(1, "Sarah Anderson", 3.8, 2100, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(1, "Sarah Anderson", 3.8, 2100, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(1, "Sarah Anderson", 3.8, 2100, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(1, "Sarah Anderson", 3.8, 2100, 13, "University of Texas at Austin", "CS", 'R'),
                     Tuple(2, "Michael Chen", 3.9, 1000, 1, "Stanford University", "CS", 'Y'),
                     Tuple(2, "Michael Chen", 3.9, 1000, 2, "Stanford University", "CS", 'R'),
-                    Tuple(2, "Michael Chen", 3.9, 1000, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(2, "Michael Chen", 3.9, 1000, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(2, "Michael Chen", 3.9, 1000, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(2, "Michael Chen", 3.9, 1000, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(2, "Michael Chen", 3.9, 1000, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(2, "Michael Chen", 3.9, 1000, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(2, "Michael Chen", 3.9, 1000, 13, "University of Texas at Austin", "CS", 'R'),
                     Tuple(3, "Emily Rodriguez", 3.7, 2300, 1, "Stanford University", "CS", 'Y'),
                     Tuple(3, "Emily Rodriguez", 3.7, 2300, 2, "Stanford University", "CS", 'R'),
-                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(3, "Emily Rodriguez", 3.7, 2300, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(3, "Emily Rodriguez", 3.7, 2300, 13, "University of Texas at Austin", "CS", 'R'),
                     Tuple(5, "David Kim", 3.6, 1750, 1, "Stanford University", "CS", 'Y'),
                     Tuple(5, "David Kim", 3.6, 1750, 2, "Stanford University", "CS", 'R'),
-                    Tuple(5, "David Kim", 3.6, 1750, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(5, "David Kim", 3.6, 1750, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(5, "David Kim", 3.6, 1750, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(5, "David Kim", 3.6, 1750, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(5, "David Kim", 3.6, 1750, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(5, "David Kim", 3.6, 1750, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(5, "David Kim", 3.6, 1750, 13, "University of Texas at Austin", "CS", 'R'),
                     Tuple(8, "Rachel Thompson", 3.4, 2000, 1, "Stanford University", "CS", 'Y'),
                     Tuple(8, "Rachel Thompson", 3.4, 2000, 2, "Stanford University", "CS", 'R'),
-                    Tuple(8, "Rachel Thompson", 3.4, 2000, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(8, "Rachel Thompson", 3.4, 2000, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(8, "Rachel Thompson", 3.4, 2000, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(8, "Rachel Thompson", 3.4, 2000, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(8, "Rachel Thompson", 3.4, 2000, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(8, "Rachel Thompson", 3.4, 2000, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(8, "Rachel Thompson", 3.4, 2000, 13, "University of Texas at Austin", "CS", 'R'),
                     Tuple(13, "James Wilson", 4.0, 1900, 1, "Stanford University", "CS", 'Y'),
                     Tuple(13, "James Wilson", 4.0, 1900, 2, "Stanford University", "CS", 'R'),
-                    Tuple(13, "James Wilson", 4.0, 1900, 3, "University of California Berkeley", "Statistics", 'Y'),
-                    Tuple(13, "James Wilson", 4.0, 1900, 5, "University of California Berkeley", "Fluid Mechanics", 'Y'),
-                    Tuple(13, "James Wilson", 4.0, 1900, 8, "University of California Berkeley", "English", 'R'),
+                    Tuple(13, "James Wilson", 4.0, 1900, 3, "University of California, Berkeley", "Statistics", 'Y'),
+                    Tuple(13, "James Wilson", 4.0, 1900, 5, "University of California, Berkeley", "Fluid Mechanics", 'Y'),
+                    Tuple(13, "James Wilson", 4.0, 1900, 8, "University of California, Berkeley", "English", 'R'),
                     Tuple(13, "James Wilson", 4.0, 1900, 13, "University of Texas at Austin", "CS", 'R'),
+                )
+            )
+        }
+    }
+
+    describe("Natural join operator") {
+        it("joins relations by matching attributes") {
+            // when
+            var relationWithStudentNameCollegeNameAndMajor = studentRelation
+                .naturalJoin(applyRelation)
+                .naturalJoin(collegeRelation)
+
+            // then
+            relationWithStudentNameCollegeNameAndMajor.name shouldBe "Student ⋈ Apply ⋈ College"
+            relationWithStudentNameCollegeNameAndMajor.attributes should containExactly(
+                "sID", "sName", "GPA", "HS", "cName", "major", "dec", "state", "enr"
+            )
+            relationWithStudentNameCollegeNameAndMajor.tuples should containExactly(
+                listOf(
+                    Tuple(1, "Sarah Anderson", 3.8, 2100, "Stanford University", "CS", 'Y', "CA", 17249),
+                    Tuple(2, "Michael Chen", 3.9, 1000, "Stanford University", "CS", 'R', "CA", 17249),
+                    Tuple(3, "Emily Rodriguez", 3.7, 2300, "University of California, Berkeley", "Statistics", 'Y', "CA", 45057),
+                    Tuple(5, "David Kim", 3.6, 1750, "University of California, Berkeley", "Fluid Mechanics", 'Y', "CA", 45057),
+                    Tuple(8, "Rachel Thompson", 3.4, 2000, "University of California, Berkeley", "English", 'R', "CA", 45057),
+                    Tuple(13, "James Wilson", 4.0, 1900, "University of Texas at Austin", "CS", 'R', "TX", 51832),
                 )
             )
         }
