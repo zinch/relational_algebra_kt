@@ -53,5 +53,23 @@ class RelationalAlgebraDslTest : DescribeSpec({
                 )
             )
         }
+
+        it("finds names and GPA of students with HS>1000 who applied to CS and were rejected using natural join") {
+            val rel = studentRelation.naturalJoin(applyRelation).select {
+                (attribute("HS") gt 1000) and
+                        (attribute("major") equal "CS") and
+                        (attribute("dec") equal 'R')
+            }.project {
+                attributes("sName", "GPA")
+            }
+
+            rel.name shouldBe "π_{sName,GPA}(σ_{((HS>1000)∧(major=CS))∧(dec=R)}(Student ⋈ Apply))"
+            rel.tuples should containExactly(
+                listOf(
+                    Tuple("James Wilson", 4.0)
+                )
+            )
+        }
+
     }
 })
