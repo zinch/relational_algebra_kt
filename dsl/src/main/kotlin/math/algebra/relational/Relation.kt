@@ -119,21 +119,19 @@ class Relation(
     }
 
     fun union(relation: Relation): Relation {
-        if (attributes.size != relation.attributes.size) {
-            throw InvalidAttributeException(
-                "Attribute count is different. " +
-                        """"$name" - ${attributes.size}, "${relation.name}" - ${relation.attributes.size}."""
-            )
-        }
-        if (attributes != relation.attributes) {
-            throw InvalidAttributeException(
-                "Attribute names are different. " +
-                        """"$name" - ${attributes}, "${relation.name}" - ${relation.attributes}."""
-            )
-        }
+        ensureRelationSchemaIsSame(relation)
 
         val newName = """$name ∪ ${relation.name}"""
         return Relation(newName, attributes, tuples + relation.tuples)
+    }
+
+    fun difference(relation: Relation): Relation {
+        ensureRelationSchemaIsSame(relation)
+
+        val newName = """$name - ${relation.name}"""
+        val tupleSet = relation.tuples.toSet()
+        val newTuples = tuples.filterNot { tupleSet.contains(it) }
+        return Relation(newName, attributes, newTuples)
     }
 
     fun rename(block: AttributesRenamingBuilder.() -> Unit): Relation {
@@ -161,6 +159,29 @@ class Relation(
 
     override fun toString(): String {
         return "Relations with attributes (${attributes.joinToString()}) and ${tuples.size} tuples"
+    }
+
+    private fun ensureRelationSchemaIsSame(relation: Relation) {
+        ensureAttributeCountIsEqual(relation)
+        ensureAttributeNamesAreEqual(relation)
+    }
+
+    private fun ensureAttributeCountIsEqual(relation: Relation) {
+        if (attributes.size != relation.attributes.size) {
+            throw InvalidAttributeException(
+                "Attribute count is different. " +
+                        """"$name" - ${attributes.size}, "${relation.name}" - ${relation.attributes.size}."""
+            )
+        }
+    }
+
+    private fun ensureAttributeNamesAreEqual(relation: Relation) {
+        if (attributes != relation.attributes) {
+            throw InvalidAttributeException(
+                "Attribute names are different. " +
+                        """"$name" - ${attributes}, "${relation.name}" - ${relation.attributes}."""
+            )
+        }
     }
 
     private class TupleAttributeAccessorDecorator(

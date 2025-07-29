@@ -270,7 +270,6 @@ class RelationalOperatorsTest : DescribeSpec({
             exception.message shouldBe """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
         }
 
-
         it("throws exception when attribute names are different") {
             val collegeNames = collegeRelation.project {
                 attributes("cName")
@@ -318,6 +317,68 @@ class RelationalOperatorsTest : DescribeSpec({
                     Tuple("David Kim"),
                     Tuple("Rachel Thompson"),
                     Tuple("James Wilson"),
+                )
+            )
+        }
+    }
+
+    describe("Difference operator") {
+        it("throws exception when attributes count is different") {
+            val studentNames = studentRelation.project {
+                attributes("sName")
+            }
+
+            val exception = shouldThrow<InvalidAttributeException> {
+                collegeRelation.difference(studentNames)
+            }
+
+            exception.message shouldBe """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+        }
+
+        it("throws exception when attribute names are different") {
+            val collegeNames = collegeRelation.project {
+                attributes("cName")
+            }
+            val studentNames = studentRelation.project {
+                attributes("sName")
+            }
+
+            val exception = shouldThrow<InvalidAttributeException> {
+                collegeNames.difference(studentNames)
+            }
+            exception.message shouldBe """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+        }
+
+        it("produces a list of attributes that do not exist in the second relation") {
+            val appliedStudentIds = applyRelation.project {
+                attributes("sID")
+            }.rename {
+                attributes("sID" to "studentId")
+            }
+
+            val lazyStudentsIds = relation {
+                name("Lazy Students")
+                attributes("studentId")
+                tuples {
+                    tuple(21)
+                    tuple(34)
+                }
+            }
+
+            val allStudentIds = studentRelation.project {
+                attributes("sID")
+            }.rename {
+                attributes("sID" to "studentId")
+            }.union(lazyStudentsIds)
+
+            val notAppliedStudentIds = allStudentIds.difference(appliedStudentIds)
+
+            notAppliedStudentIds.name shouldBe "ρ_{studentId}(π_{sID}(Student)) ∪ Lazy Students - ρ_{studentId}(π_{sID}(Apply))"
+            notAppliedStudentIds.attributes should containExactly("studentId")
+            notAppliedStudentIds.tuples should containExactly(
+                listOf(
+                    Tuple(21),
+                    Tuple(34)
                 )
             )
         }
