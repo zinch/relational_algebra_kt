@@ -56,3 +56,15 @@ class ProjectionBuilder {
         attributes.addAll(attributeNames)
     }
 }
+
+class AttributesRenamingBuilder {
+    private val attributeMappings = mutableMapOf<String, String>()
+
+    fun build(): Map<String, String> {
+        return attributeMappings
+    }
+
+    fun attributes(vararg attributeMapping: Pair<String, String>) {
+        attributeMappings.putAll(attributeMapping)
+    }
+}

@@ -70,6 +70,5 @@ class RelationalAlgebraDslTest : DescribeSpec({
                 )
             )
         }
-
     }
 })

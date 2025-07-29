@@ -1,5 +1,6 @@
 package math.algebra.relational
 
+import math.algebra.relational.dsl.AttributesRenamingBuilder
 import math.algebra.relational.dsl.ProjectionBuilder
 
 class Relation(
@@ -117,7 +118,35 @@ class Relation(
         return Relation(newName, (firstRelationAttributes + secondRelationAttributes).toList(), newTuples)
     }
 
-    fun getAttributeIndex(attrName: String): Int {
+    fun union(relation: Relation): Relation {
+        if (attributes.size != relation.attributes.size) {
+            throw InvalidAttributeException(
+                "Attribute count is different. " +
+                        """"$name" - ${attributes.size}, "${relation.name}" - ${relation.attributes.size}."""
+            )
+        }
+        if (attributes != relation.attributes) {
+            throw InvalidAttributeException(
+                "Attribute names are different. " +
+                        """"$name" - ${attributes}, "${relation.name}" - ${relation.attributes}."""
+            )
+        }
+
+        val newName = """$name ∪ ${relation.name}"""
+        return Relation(newName, attributes, tuples + relation.tuples)
+    }
+
+    fun rename(block: AttributesRenamingBuilder.() -> Unit): Relation {
+        val attributesRenamingBuilder = AttributesRenamingBuilder()
+        attributesRenamingBuilder.block()
+        val attributeMappings = attributesRenamingBuilder.build()
+
+        val newAttributes = attributes.map { attributeMappings[it] ?: it }
+        val newName = "ρ_{${newAttributes.joinToString(separator = ",")}}($name)"
+        return Relation(newName, newAttributes, tuples)
+    }
+
+    internal fun getAttributeIndex(attrName: String): Int {
         val attrIdx = attributes.indexOf(attrName)
         if (attrIdx == -1) {
             throwInvalidAttributesException(attrName)

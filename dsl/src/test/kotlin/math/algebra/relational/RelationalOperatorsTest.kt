@@ -1,5 +1,6 @@
 package math.algebra.relational
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.containExactly
 import io.kotest.matchers.should
@@ -225,6 +226,98 @@ class RelationalOperatorsTest : DescribeSpec({
                     Tuple(5, "David Kim", 3.6, 1750, "University of California, Berkeley", "Fluid Mechanics", 'Y', "CA", 45057),
                     Tuple(8, "Rachel Thompson", 3.4, 2000, "University of California, Berkeley", "English", 'R', "CA", 45057),
                     Tuple(13, "James Wilson", 4.0, 1900, "University of Texas at Austin", "CS", 'R', "TX", 51832),
+                )
+            )
+        }
+    }
+
+    describe("Rename operator") {
+        it("renames schema") {
+            val studentNamesWithSchoolSizes = studentRelation
+                .project {
+                    attributes("sName", "HS")
+                }.rename {
+                    attributes("sName" to "name", "HS" to "schoolSize")
+                }
+
+
+            studentNamesWithSchoolSizes.name shouldBe "ρ_{name,schoolSize}(π_{sName,HS}(Student))"
+            studentNamesWithSchoolSizes.attributes should containExactly("name", "schoolSize")
+
+            studentNamesWithSchoolSizes.tuples should containExactly(
+                listOf(
+                    Tuple("Sarah Anderson", 2100),
+                    Tuple("Michael Chen", 1000),
+                    Tuple("Emily Rodriguez", 2300),
+                    Tuple("David Kim", 1750),
+                    Tuple("Rachel Thompson", 2000),
+                    Tuple("James Wilson", 1900),
+                )
+            )
+        }
+    }
+
+    describe("Union operator") {
+        it("throws exception when attributes count is different") {
+            val studentNames = studentRelation.project {
+                attributes("sName")
+            }
+
+            val exception = shouldThrow<InvalidAttributeException> {
+                collegeRelation.union(studentNames)
+            }
+
+            exception.message shouldBe """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+        }
+
+
+        it("throws exception when attribute names are different") {
+            val collegeNames = collegeRelation.project {
+                attributes("cName")
+            }
+            val studentNames = studentRelation.project {
+                attributes("sName")
+            }
+
+            val exception = shouldThrow<InvalidAttributeException> {
+                collegeNames.union(studentNames)
+            }
+            exception.message shouldBe """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+        }
+
+        it("produces combined list of attributes of two relations") {
+            val collegeNames = collegeRelation.project {
+                attributes("cName")
+            }.rename {
+                attributes("cName" to "name")
+            }
+
+            val studentNames = studentRelation.project {
+                attributes("sName")
+            }.rename {
+                attributes("sName" to "name")
+            }
+
+            val allNames = collegeNames.union(studentNames)
+
+            allNames.name shouldBe "ρ_{name}(π_{cName}(College)) ∪ ρ_{name}(π_{sName}(Student))"
+            allNames.attributes should containExactly("name")
+
+            allNames.tuples should containExactly(
+                listOf(
+                    Tuple("Stanford University"),
+                    Tuple("University of California, Berkeley"),
+                    Tuple("Harvard University"),
+                    Tuple("University of Texas at Austin"),
+                    Tuple("Florida International University"),
+                    Tuple("Arizona State University"),
+                    Tuple("University of Washington"),
+                    Tuple("Sarah Anderson"),
+                    Tuple("Michael Chen"),
+                    Tuple("Emily Rodriguez"),
+                    Tuple("David Kim"),
+                    Tuple("Rachel Thompson"),
+                    Tuple("James Wilson"),
                 )
             )
         }
