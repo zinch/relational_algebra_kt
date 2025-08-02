@@ -236,12 +236,13 @@ class RelationalOperatorsTest : DescribeSpec({
             val studentNamesWithSchoolSizes = studentRelation
                 .project {
                     attributes("sName", "HS")
-                }.rename {
+                }
+                .rename {
                     attributes("sName" to "name", "HS" to "schoolSize")
                 }
 
 
-            studentNamesWithSchoolSizes.name shouldBe "ρ_{name,schoolSize}(π_{sName,HS}(Student))"
+            studentNamesWithSchoolSizes.name shouldBe "ρ_{name←sName,schoolSize←HS}(π_{sName,HS}(Student))"
             studentNamesWithSchoolSizes.attributes should containExactly("name", "schoolSize")
 
             studentNamesWithSchoolSizes.tuples should containExactly(
@@ -299,7 +300,7 @@ class RelationalOperatorsTest : DescribeSpec({
 
             val allNames = collegeNames.union(studentNames)
 
-            allNames.name shouldBe "ρ_{name}(π_{cName}(College)) ∪ ρ_{name}(π_{sName}(Student))"
+            allNames.name shouldBe "ρ_{name←cName}(π_{cName}(College)) ∪ ρ_{name←sName}(π_{sName}(Student))"
             allNames.attributes should containExactly("name")
 
             allNames.tuples should containExactly(
@@ -373,7 +374,7 @@ class RelationalOperatorsTest : DescribeSpec({
 
             val notAppliedStudentIds = allStudentIds.difference(appliedStudentIds)
 
-            notAppliedStudentIds.name shouldBe "ρ_{studentId}(π_{sID}(Student)) ∪ Lazy Students - ρ_{studentId}(π_{sID}(Apply))"
+            notAppliedStudentIds.name shouldBe "ρ_{studentId←sID}(π_{sID}(Student)) ∪ Lazy Students - ρ_{studentId←sID}(π_{sID}(Apply))"
             notAppliedStudentIds.attributes should containExactly("studentId")
             notAppliedStudentIds.tuples should containExactly(
                 listOf(

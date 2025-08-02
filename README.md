@@ -43,3 +43,48 @@ val newRelation = studentRelation.select {
 
 println(newRelation.name) // σ_{((GPA>4.0)∨(GPA=4.0))∧(HS<2000)}(Student)
 ```
+### Cross product (R × S)
+Creates a new relation by combining each tuple from the first relation
+with every tuple from the second relation. If the first relation has N tuples
+and the second relation has M tuples, the resulting relation will have MxN tuples.
+
+```kotlin
+ var allStudentsWithAllColleges
+        = studentRelation.cross(collegeRelation) // Student × College
+```
+
+### Natural join (R ⋈ S)
+Joins tuples from two relations based on equality of values in their common attributes. 
+
+```kotlin
+ var studentsWithCollegesWhereTheyApplied
+        = studentRelation.naturalJoin(applyRelation) // Student ⋈ Apply
+```
+
+### Rename operator (ρ)
+Transforms a relation by renaming one or multiple attributes.
+It is useful because in relational algebra attributes must have the same name if you need to perform
+a natural join or a union.
+
+```kotlin
+val studentRelationWithStudentName = studentRelation.rename {
+    attributes("sName" to "studentName")
+}
+```
+
+### Union operator (R ∪ S)
+This operator combines all tuples from two relations.
+It is required that all attribute names must be the same in both relations.
+
+```kotlin
+var allNames = studentNames.union(professorNames) // ρ_{name←sName}(π_{sName}(Student)) ∪ ρ_{name←pName}(π_{pName}(Professor))
+```
+
+### Difference operator (R - S)
+This operator retains all tuples from the first relation that do not match any tuples from the second relation.
+It is required that all attribute names must be the same in both relations.
+
+```kotlin
+var studentNamesThatDoNotMatchProfessorNames
+        = studentNames.differenced(professorNames) // ρ_{name←sName}(π_{sName}(Student)) - ρ_{name←pName}(π_{pName}(Professor))
+```

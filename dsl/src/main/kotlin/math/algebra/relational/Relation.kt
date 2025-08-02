@@ -140,7 +140,11 @@ class Relation(
         val attributeMappings = attributesRenamingBuilder.build()
 
         val newAttributes = attributes.map { attributeMappings[it] ?: it }
-        val newName = "ρ_{${newAttributes.joinToString(separator = ",")}}($name)"
+        val renamedAttributes = attributes
+            .filter { attributeMappings.containsKey(it) }
+            .map { """${attributeMappings[it]}←$it""" }
+
+        val newName = "ρ_{${renamedAttributes.joinToString(separator = ",")}}($name)"
         return Relation(newName, newAttributes, tuples)
     }
 
