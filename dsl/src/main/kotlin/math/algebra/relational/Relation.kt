@@ -134,6 +134,12 @@ class Relation(
         return Relation(newName, attributes, newTuples)
     }
 
+    fun intersection(relation: Relation): Relation {
+        ensureRelationSchemaIsSame(relation)
+        val newName = """$name ∩ ${relation.name}"""
+        return Relation(newName, attributes, tuples.intersect(relation.tuples).toList())
+    }
+
     fun rename(block: AttributesRenamingBuilder.() -> Unit): Relation {
         val attributesRenamingBuilder = AttributesRenamingBuilder()
         attributesRenamingBuilder.block()

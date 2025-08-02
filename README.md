@@ -88,3 +88,12 @@ It is required that all attribute names must be the same in both relations.
 var studentNamesThatDoNotMatchProfessorNames
         = studentNames.differenced(professorNames) // ρ_{name←sName}(π_{sName}(Student)) - ρ_{name←pName}(π_{pName}(Professor))
 ```
+
+### Intersection operator (R ∩ S)
+This operator retains only matching tuples from both relations, eliminating duplicates.
+It is required that all attribute names must be the same in both relations.
+
+```kotlin
+var studentNamesThatMatchProfessorNames
+        = studentNames.intersection(professorNames) // ρ_{name←sName}(π_{sName}(Student)) ∩ ρ_{name←pName}(π_{pName}(Professor))
+```

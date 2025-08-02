@@ -1,6 +1,6 @@
 package math.algebra.relational
 
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.containExactly
 import io.kotest.matchers.should
@@ -93,9 +93,7 @@ class RelationalOperatorsTest : DescribeSpec({
         describe("with an 'Apply' relation") {
             it("returns all student IDs") {
                 // when
-                val relationWithStudentIds = applyRelation.project {
-                    attributes("sID")
-                }
+                val relationWithStudentIds = applyRelation.project { attributes("sID") }
 
                 // then
                 relationWithStudentIds.name shouldBe "π_{sID}(Apply)"
@@ -233,18 +231,14 @@ class RelationalOperatorsTest : DescribeSpec({
 
     describe("Rename operator") {
         it("renames schema") {
+            // given
             val studentNamesWithSchoolSizes = studentRelation
-                .project {
-                    attributes("sName", "HS")
-                }
-                .rename {
-                    attributes("sName" to "name", "HS" to "schoolSize")
-                }
+                .project { attributes("sName", "HS") }
+                .rename { attributes("sName" to "name", "HS" to "schoolSize") }
 
-
+            // then
             studentNamesWithSchoolSizes.name shouldBe "ρ_{name←sName,schoolSize←HS}(π_{sName,HS}(Student))"
             studentNamesWithSchoolSizes.attributes should containExactly("name", "schoolSize")
-
             studentNamesWithSchoolSizes.tuples should containExactly(
                 listOf(
                     Tuple("Sarah Anderson", 2100),
@@ -260,49 +254,42 @@ class RelationalOperatorsTest : DescribeSpec({
 
     describe("Union operator") {
         it("throws exception when attributes count is different") {
-            val studentNames = studentRelation.project {
-                attributes("sName")
-            }
+            // given
+            val studentNames = studentRelation.project { attributes("sName") }
 
-            val exception = shouldThrow<InvalidAttributeException> {
-                collegeRelation.union(studentNames)
-            }
-
-            exception.message shouldBe """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+            // then
+            shouldThrowMessage(
+                """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+            ) { collegeRelation.union(studentNames) }
         }
 
         it("throws exception when attribute names are different") {
-            val collegeNames = collegeRelation.project {
-                attributes("cName")
-            }
-            val studentNames = studentRelation.project {
-                attributes("sName")
-            }
+            // given
+            val collegeNames = collegeRelation.project { attributes("cName") }
+            val studentNames = studentRelation.project { attributes("sName") }
 
-            val exception = shouldThrow<InvalidAttributeException> {
-                collegeNames.union(studentNames)
-            }
-            exception.message shouldBe """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+            // then
+            shouldThrowMessage(
+                """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+            ) { collegeNames.union(studentNames) }
         }
 
         it("produces combined list of attributes of two relations") {
-            val collegeNames = collegeRelation.project {
-                attributes("cName")
-            }.rename {
-                attributes("cName" to "name")
-            }
+            // given
+            val collegeNames = collegeRelation
+                .project { attributes("cName") }
+                .rename { attributes("cName" to "name") }
 
-            val studentNames = studentRelation.project {
-                attributes("sName")
-            }.rename {
-                attributes("sName" to "name")
-            }
+            val studentNames = studentRelation
+                .project { attributes("sName") }
+                .rename { attributes("sName" to "name") }
 
+            // when
             val allNames = collegeNames.union(studentNames)
 
+            // then
             allNames.name shouldBe "ρ_{name←cName}(π_{cName}(College)) ∪ ρ_{name←sName}(π_{sName}(Student))"
             allNames.attributes should containExactly("name")
-
             allNames.tuples should containExactly(
                 listOf(
                     Tuple("Stanford University"),
@@ -325,37 +312,31 @@ class RelationalOperatorsTest : DescribeSpec({
 
     describe("Difference operator") {
         it("throws exception when attributes count is different") {
-            val studentNames = studentRelation.project {
-                attributes("sName")
-            }
+            // given
+            val studentNames = studentRelation.project { attributes("sName") }
 
-            val exception = shouldThrow<InvalidAttributeException> {
-                collegeRelation.difference(studentNames)
-            }
-
-            exception.message shouldBe """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+            // then
+            shouldThrowMessage(
+                """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+            ) { collegeRelation.difference(studentNames) }
         }
 
         it("throws exception when attribute names are different") {
-            val collegeNames = collegeRelation.project {
-                attributes("cName")
-            }
-            val studentNames = studentRelation.project {
-                attributes("sName")
-            }
+            // given
+            val collegeNames = collegeRelation.project { attributes("cName") }
+            val studentNames = studentRelation.project { attributes("sName") }
 
-            val exception = shouldThrow<InvalidAttributeException> {
-                collegeNames.difference(studentNames)
-            }
-            exception.message shouldBe """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+            // then
+            shouldThrowMessage(
+                """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+            ) { collegeNames.difference(studentNames) }
         }
 
         it("produces a list of attributes that do not exist in the second relation") {
-            val appliedStudentIds = applyRelation.project {
-                attributes("sID")
-            }.rename {
-                attributes("sID" to "studentId")
-            }
+            // given
+            val appliedStudentIds = applyRelation
+                .project { attributes("sID") }
+                .rename { attributes("sID" to "studentId") }
 
             val lazyStudentsIds = relation {
                 name("Lazy Students")
@@ -366,20 +347,74 @@ class RelationalOperatorsTest : DescribeSpec({
                 }
             }
 
-            val allStudentIds = studentRelation.project {
-                attributes("sID")
-            }.rename {
-                attributes("sID" to "studentId")
-            }.union(lazyStudentsIds)
+            val allStudentIds = studentRelation
+                .project { attributes("sID") }
+                .rename { attributes("sID" to "studentId") }
+                .union(lazyStudentsIds)
 
+            // when
             val notAppliedStudentIds = allStudentIds.difference(appliedStudentIds)
 
+            // then
             notAppliedStudentIds.name shouldBe "ρ_{studentId←sID}(π_{sID}(Student)) ∪ Lazy Students - ρ_{studentId←sID}(π_{sID}(Apply))"
             notAppliedStudentIds.attributes should containExactly("studentId")
             notAppliedStudentIds.tuples should containExactly(
                 listOf(
                     Tuple(21),
                     Tuple(34)
+                )
+            )
+        }
+    }
+
+    describe("Intersection operator") {
+        it("throws exception when attributes count is different") {
+            // given
+            val studentNames = studentRelation.project { attributes("sName") }
+
+            // then
+            shouldThrowMessage(
+                """Attribute count is different. "College" - 3, "π_{sName}(Student)" - 1."""
+            ) { collegeRelation.intersection(studentNames) }
+        }
+
+        it("throws exception when attribute names are different") {
+            // given
+            val collegeNames = collegeRelation.project { attributes("cName") }
+            val studentNames = studentRelation.project { attributes("sName") }
+
+            // then
+            shouldThrowMessage(
+                """Attribute names are different. "π_{cName}(College)" - [cName], "π_{sName}(Student)" - [sName]."""
+            ) { collegeNames.intersection(studentNames) }
+        }
+
+        it("produces a list of attributes that exist in both relations") {
+            // given
+            val collegesAppliedTo = applyRelation
+                .project { attributes("cName") }
+                .rename { attributes("cName" to "collegeName") }
+
+            val collegeNames = relation {
+                name("College")
+                attributes("cName")
+                tuples {
+                    tuple("Stanford University")
+                    tuple("University of California, Berkeley")
+                    tuple("University of Illinois Urbana-Champaign")
+                }
+            }.rename { attributes("cName" to "collegeName") }
+
+            // when
+            val collegesWhereStudentApplied = collegeNames.intersection(collegesAppliedTo)
+
+            // then
+            collegesWhereStudentApplied.name shouldBe "ρ_{collegeName←cName}(College) ∩ ρ_{collegeName←cName}(π_{cName}(Apply))"
+            collegesWhereStudentApplied.attributes should containExactly("collegeName")
+            collegesWhereStudentApplied.tuples should containExactly(
+                listOf(
+                    Tuple("Stanford University"),
+                    Tuple("University of California, Berkeley"),
                 )
             )
         }
