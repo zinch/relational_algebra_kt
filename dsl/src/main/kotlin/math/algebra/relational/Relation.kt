@@ -1,6 +1,6 @@
 package math.algebra.relational
 
-import math.algebra.relational.dsl.AttributesRenamingBuilder
+import math.algebra.relational.dsl.RenameOperatorBuilder
 import math.algebra.relational.dsl.ProjectionBuilder
 
 class Relation(
@@ -121,14 +121,14 @@ class Relation(
     fun union(relation: Relation): Relation {
         ensureRelationSchemaIsSame(relation)
 
-        val newName = """$name ∪ ${relation.name}"""
+        val newName = "$name ∪ ${relation.name}"
         return Relation(newName, attributes, tuples + relation.tuples)
     }
 
     fun difference(relation: Relation): Relation {
         ensureRelationSchemaIsSame(relation)
 
-        val newName = """$name - ${relation.name}"""
+        val newName = "$name - ${relation.name}"
         val tupleSet = relation.tuples.toSet()
         val newTuples = tuples.filterNot { tupleSet.contains(it) }
         return Relation(newName, attributes, newTuples)
@@ -136,22 +136,31 @@ class Relation(
 
     fun intersection(relation: Relation): Relation {
         ensureRelationSchemaIsSame(relation)
-        val newName = """$name ∩ ${relation.name}"""
+        val newName = "$name ∩ ${relation.name}"
         return Relation(newName, attributes, tuples.intersect(relation.tuples).toList())
     }
 
-    fun rename(block: AttributesRenamingBuilder.() -> Unit): Relation {
-        val attributesRenamingBuilder = AttributesRenamingBuilder()
-        attributesRenamingBuilder.block()
-        val attributeMappings = attributesRenamingBuilder.build()
+    fun rename(block: RenameOperatorBuilder.() -> Unit): Relation {
+        val renameOperatorBuilder = RenameOperatorBuilder()
+        renameOperatorBuilder.block()
+        val attributeMappings = renameOperatorBuilder.attributeMappings
 
-        val newAttributes = attributes.map { attributeMappings[it] ?: it }
-        val renamedAttributes = attributes
-            .filter { attributeMappings.containsKey(it) }
-            .map { """${attributeMappings[it]}←$it""" }
-
-        val newName = "ρ_{${renamedAttributes.joinToString(separator = ",")}}($name)"
-        return Relation(newName, newAttributes, tuples)
+        val newAttributes: List<String>
+        val attributesMapping: String
+        if (attributeMappings.isEmpty()) {
+            newAttributes = attributes
+            attributesMapping = ""
+        } else {
+            newAttributes = attributes.map { attributeMappings[it] ?: it }
+            attributesMapping = attributes
+                .filter { attributeMappings.containsKey(it) }
+                .joinToString(separator = ",", prefix = "(", postfix = ")") {
+                    "${attributeMappings[it]}←$it"
+                }
+        }
+        val newRelationName = renameOperatorBuilder.relationName
+        val fullRelationName = "ρ_{$newRelationName$attributesMapping}($name)"
+        return Relation(fullRelationName, newAttributes, tuples)
     }
 
     internal fun getAttributeIndex(attrName: String): Int {

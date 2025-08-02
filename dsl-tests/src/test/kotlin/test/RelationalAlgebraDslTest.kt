@@ -35,16 +35,29 @@ class RelationalAlgebraDslTest : DescribeSpec({
         }
     }
 
+    val collegeRelation = relation {
+        name("College")
+        attributes("cName", "state", "enr")
+        tuples {
+            tuple("Stanford University", "CA", 17249)
+            tuple("University of California, Berkeley", "CA", 45057)
+            tuple("Harvard University", "MA", 23731)
+            tuple("University of Texas at Austin", "TX", 51832)
+            tuple("Florida International University", "FL", 58786)
+            tuple("Arizona State University", "AZ", 83946)
+            tuple("University of Washington", "WA", 47400)
+        }
+    }
+
     describe("Combination of operators") {
         it("finds names and GPA of students with HS>1000 who applied to CS and were rejected using cross product") {
-            val rel = studentRelation.cross(applyRelation).select {
-                attribute("Student.sID") equal attribute("Apply.sID") and
-                        (attribute("HS") gt 1000) and
-                        (attribute("major") equal "CS") and
-                        (attribute("dec") equal 'R')
-            }.project {
-                attributes("sName", "GPA")
-            }
+            val rel = studentRelation.cross(applyRelation)
+                .select {
+                    attribute("Student.sID") equal attribute("Apply.sID") and
+                            (attribute("HS") gt 1000) and
+                            (attribute("major") equal "CS") and
+                            (attribute("dec") equal 'R')
+                }.project { attributes("sName", "GPA") }
 
             rel.name shouldBe "π_{sName,GPA}(σ_{(((Student.sID=Apply.sID)∧(HS>1000))∧(major=CS))∧(dec=R)}(Student × Apply))"
             rel.tuples should containExactly(
@@ -55,18 +68,48 @@ class RelationalAlgebraDslTest : DescribeSpec({
         }
 
         it("finds names and GPA of students with HS>1000 who applied to CS and were rejected using natural join") {
-            val rel = studentRelation.naturalJoin(applyRelation).select {
-                (attribute("HS") gt 1000) and
-                        (attribute("major") equal "CS") and
-                        (attribute("dec") equal 'R')
-            }.project {
-                attributes("sName", "GPA")
-            }
+            val rel = studentRelation.naturalJoin(applyRelation)
+                .select {
+                    (attribute("HS") gt 1000) and
+                            (attribute("major") equal "CS") and
+                            (attribute("dec") equal 'R')
+                }.project { attributes("sName", "GPA") }
 
             rel.name shouldBe "π_{sName,GPA}(σ_{((HS>1000)∧(major=CS))∧(dec=R)}(Student ⋈ Apply))"
             rel.tuples should containExactly(
                 listOf(
                     Tuple("James Wilson", 4.0)
+                )
+            )
+        }
+
+        it("finds pairs of college names in the same state") {
+            val collegesInTheSameState = collegeRelation
+                .rename {
+                    relation("c1")
+                    attributes("cName" to "c1", "state" to "s1", "enr" to "e1")
+                }
+                .cross(
+                    collegeRelation
+                        .rename {
+                            relation("c2")
+                            attributes("cName" to "c2", "state" to "s2", "enr" to "e2")
+                        })
+                .select { attribute("s1") equal attribute("s2") }
+
+            collegesInTheSameState.name shouldBe "σ_{s1=s2}(ρ_{c1(c1←cName,s1←state,e1←enr)}(College) × ρ_{c2(c2←cName,s2←state,e2←enr)}(College))"
+            collegesInTheSameState.attributes should containExactly("c1", "s1", "e1", "c2", "s2", "e2")
+            collegesInTheSameState.tuples should containExactly(
+                listOf(
+                    Tuple("Stanford University", "CA", 17249, "Stanford University", "CA", 17249),
+                    Tuple("Stanford University", "CA", 17249, "University of California, Berkeley", "CA", 45057),
+                    Tuple("University of California, Berkeley", "CA", 45057, "Stanford University", "CA", 17249),
+                    Tuple("University of California, Berkeley", "CA", 45057, "University of California, Berkeley", "CA", 45057),
+                    Tuple("Harvard University", "MA", 23731, "Harvard University", "MA", 23731),
+                    Tuple("University of Texas at Austin", "TX", 51832, "University of Texas at Austin", "TX", 51832),
+                    Tuple("Florida International University", "FL", 58786, "Florida International University", "FL", 58786),
+                    Tuple("Arizona State University", "AZ", 83946, "Arizona State University", "AZ", 83946),
+                    Tuple("University of Washington", "WA", 47400, "University of Washington", "WA", 47400),
                 )
             )
         }

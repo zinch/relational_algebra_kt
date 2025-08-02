@@ -57,14 +57,18 @@ class ProjectionBuilder {
     }
 }
 
-class AttributesRenamingBuilder {
-    private val attributeMappings = mutableMapOf<String, String>()
+class RenameOperatorBuilder {
+    private var newRelationName: String = ""
+    private var renamedAttributes: Map<String, String> = emptyMap()
 
-    fun build(): Map<String, String> {
-        return attributeMappings
-    }
+    val relationName: String get() = newRelationName
+    val attributeMappings: Map<String, String> get() = renamedAttributes.toMap()
 
     fun attributes(vararg attributeMapping: Pair<String, String>) {
-        attributeMappings.putAll(attributeMapping)
+        renamedAttributes = attributeMapping.toMap()
+    }
+
+    fun relation(newName: String) {
+        newRelationName = newName
     }
 }
