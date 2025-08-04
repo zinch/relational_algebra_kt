@@ -89,3 +89,15 @@ internal data class Or(val first: Predicate, val second: Predicate) : Predicate 
 
     override fun toString() = "($first)∨($second)"
 }
+
+fun not(predicate: Predicate): Predicate {
+    return Not(predicate)
+}
+
+internal data class Not(val predicate: Predicate) : Predicate {
+    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
+        return !predicate.isTrue(attribute)
+    }
+
+    override fun toString() = "¬($predicate)"
+}

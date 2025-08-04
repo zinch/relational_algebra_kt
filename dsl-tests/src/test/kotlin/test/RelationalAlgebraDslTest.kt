@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import math.algebra.relational.Tuple
 import math.algebra.relational.attribute
 import math.algebra.relational.dsl.relation
+import math.algebra.relational.not
 
 class RelationalAlgebraDslTest : DescribeSpec({
     val studentRelation = relation {
@@ -83,33 +84,55 @@ class RelationalAlgebraDslTest : DescribeSpec({
             )
         }
 
-        it("finds pairs of college names in the same state") {
+        it("finds pairs of college names in the same state using cross join") {
             val collegesInTheSameState = collegeRelation
                 .rename {
                     relation("c1")
-                    attributes("cName" to "c1", "state" to "s1", "enr" to "e1")
+                    attributes("cName" to "n1", "state" to "s1", "enr" to "e1")
                 }
                 .cross(
                     collegeRelation
                         .rename {
                             relation("c2")
-                            attributes("cName" to "c2", "state" to "s2", "enr" to "e2")
+                            attributes("cName" to "n2", "state" to "s2", "enr" to "e2")
                         })
-                .select { attribute("s1") equal attribute("s2") }
+                .select {
+                    attribute("s1") equal attribute("s2") and
+                            not(attribute("n1") equal attribute("n2"))
+                }
 
-            collegesInTheSameState.name shouldBe "σ_{s1=s2}(ρ_{c1(c1←cName,s1←state,e1←enr)}(College) × ρ_{c2(c2←cName,s2←state,e2←enr)}(College))"
-            collegesInTheSameState.attributes should containExactly("c1", "s1", "e1", "c2", "s2", "e2")
+            collegesInTheSameState.name shouldBe "σ_{(s1=s2)∧(¬(n1=n2))}(ρ_{c1(n1←cName,s1←state,e1←enr)}(College) × ρ_{c2(n2←cName,s2←state,e2←enr)}(College))"
+            collegesInTheSameState.attributes should containExactly("n1", "s1", "e1", "n2", "s2", "e2")
             collegesInTheSameState.tuples should containExactly(
                 listOf(
-                    Tuple("Stanford University", "CA", 17249, "Stanford University", "CA", 17249),
                     Tuple("Stanford University", "CA", 17249, "University of California, Berkeley", "CA", 45057),
                     Tuple("University of California, Berkeley", "CA", 45057, "Stanford University", "CA", 17249),
-                    Tuple("University of California, Berkeley", "CA", 45057, "University of California, Berkeley", "CA", 45057),
-                    Tuple("Harvard University", "MA", 23731, "Harvard University", "MA", 23731),
-                    Tuple("University of Texas at Austin", "TX", 51832, "University of Texas at Austin", "TX", 51832),
-                    Tuple("Florida International University", "FL", 58786, "Florida International University", "FL", 58786),
-                    Tuple("Arizona State University", "AZ", 83946, "Arizona State University", "AZ", 83946),
-                    Tuple("University of Washington", "WA", 47400, "University of Washington", "WA", 47400),
+                )
+            )
+        }
+
+        it("finds pairs of college names in the same state using natural join") {
+            val collegesInTheSameState = collegeRelation
+                .rename {
+                    relation("c1")
+                    attributes("cName" to "n1", "state" to "s", "enr" to "e1")
+                }
+                .naturalJoin(
+                    collegeRelation
+                        .rename {
+                            relation("c2")
+                            attributes("cName" to "n2", "state" to "s", "enr" to "e2")
+                        })
+                .select {
+                    not(attribute("n1") equal attribute("n2"))
+                }
+
+            collegesInTheSameState.name shouldBe "σ_{¬(n1=n2)}(ρ_{c1(n1←cName,s←state,e1←enr)}(College) ⋈ ρ_{c2(n2←cName,s←state,e2←enr)}(College))"
+            collegesInTheSameState.attributes should containExactly("n1", "s", "e1", "n2", "e2")
+            collegesInTheSameState.tuples should containExactly(
+                listOf(
+                    Tuple("Stanford University", "CA", 17249, "University of California, Berkeley", 45057),
+                    Tuple("University of California, Berkeley", "CA", 45057, "Stanford University", 17249),
                 )
             )
         }
