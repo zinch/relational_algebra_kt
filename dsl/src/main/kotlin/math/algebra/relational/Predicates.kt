@@ -20,7 +20,7 @@ sealed interface Predicate {
         return Or(this, other)
     }
 
-    fun isTrue(attribute: TupleAttributeAccessor): Boolean
+    fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean
 }
 
 internal abstract class AttributePredicate(
@@ -44,47 +44,46 @@ internal abstract class AttributePredicate(
 }
 
 internal class Equal(val attributeName: String, val value: Any) : Predicate {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        val actualValue = attribute.getAttributeValue(attributeName)
-        return if (value is Attribute) {
-            actualValue == attribute.getAttributeValue(value.name)
-        } else {
-            actualValue == value
-        }
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        val actualValue = attributeAccessor.getAttributeValue(attributeName)
+        val valueToCompareWith = if (value is Attribute) attributeAccessor.getAttributeValue(value.name) else value
+        return actualValue == valueToCompareWith
     }
 
     override fun toString() = "$attributeName=$value"
 }
 
 internal class LessThan(attributeName: String, val value: Any) : AttributePredicate(attributeName) {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        val comparableAttribute = ensureAttributeIsComparableWithValue(attribute, value)
-        return comparableAttribute < value
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        val valueToCompareWith = if (value is Attribute) attributeAccessor.getAttributeValue(value.name) else value
+        val comparableAttribute = ensureAttributeIsComparableWithValue(attributeAccessor, valueToCompareWith)
+        return comparableAttribute < valueToCompareWith
     }
 
     override fun toString() = "$attributeName<$value"
 }
 
 internal class GreaterThan(attributeName: String, val value: Any) : AttributePredicate(attributeName) {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        val comparableAttribute = ensureAttributeIsComparableWithValue(attribute, value)
-        return comparableAttribute > value
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        val valueToCompareWith = if (value is Attribute) attributeAccessor.getAttributeValue(value.name) else value
+        val comparableAttribute = ensureAttributeIsComparableWithValue(attributeAccessor, valueToCompareWith)
+        return comparableAttribute > valueToCompareWith
     }
 
     override fun toString() = "$attributeName>$value"
 }
 
 internal data class And(val first: Predicate, val second: Predicate) : Predicate {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        return first.isTrue(attribute) && second.isTrue(attribute)
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        return first.isTrue(attributeAccessor) && second.isTrue(attributeAccessor)
     }
 
     override fun toString() = "($first)∧($second)"
 }
 
 internal data class Or(val first: Predicate, val second: Predicate) : Predicate {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        return first.isTrue(attribute) || second.isTrue(attribute)
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        return first.isTrue(attributeAccessor) || second.isTrue(attributeAccessor)
     }
 
     override fun toString() = "($first)∨($second)"
@@ -95,8 +94,8 @@ fun not(predicate: Predicate): Predicate {
 }
 
 internal data class Not(val predicate: Predicate) : Predicate {
-    override fun isTrue(attribute: TupleAttributeAccessor): Boolean {
-        return !predicate.isTrue(attribute)
+    override fun isTrue(attributeAccessor: TupleAttributeAccessor): Boolean {
+        return !predicate.isTrue(attributeAccessor)
     }
 
     override fun toString() = "¬($predicate)"

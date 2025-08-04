@@ -124,15 +124,14 @@ class RelationalAlgebraDslTest : DescribeSpec({
                             attributes("cName" to "n2", "state" to "s", "enr" to "e2")
                         })
                 .select {
-                    not(attribute("n1") equal attribute("n2"))
+                    attribute("n1") lt attribute("n2")
                 }
 
-            collegesInTheSameState.name shouldBe "σ_{¬(n1=n2)}(ρ_{c1(n1←cName,s←state,e1←enr)}(College) ⋈ ρ_{c2(n2←cName,s←state,e2←enr)}(College))"
+            collegesInTheSameState.name shouldBe "σ_{n1<n2}(ρ_{c1(n1←cName,s←state,e1←enr)}(College) ⋈ ρ_{c2(n2←cName,s←state,e2←enr)}(College))"
             collegesInTheSameState.attributes should containExactly("n1", "s", "e1", "n2", "e2")
             collegesInTheSameState.tuples should containExactly(
                 listOf(
                     Tuple("Stanford University", "CA", 17249, "University of California, Berkeley", 45057),
-                    Tuple("University of California, Berkeley", "CA", 45057, "Stanford University", 17249),
                 )
             )
         }
