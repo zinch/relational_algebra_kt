@@ -77,7 +77,8 @@ This operator combines all tuples from two relations.
 It is required that all attribute names must be the same in both relations.
 
 ```kotlin
-var allNames = studentNames.union(professorNames) // ρ_{name←sName}(π_{sName}(Student)) ∪ ρ_{name←pName}(π_{pName}(Professor))
+ // ρ_{name←sName}(π_{sName}(Student)) ∪ ρ_{name←pName}(π_{pName}(Professor))
+var allNames = studentNames.union(professorNames)
 ```
 
 ### Difference operator (R - S)
@@ -85,8 +86,9 @@ This operator retains all tuples from the first relation that do not match any t
 It is required that all attribute names must be the same in both relations.
 
 ```kotlin
+// ρ_{name←sName}(π_{sName}(Student)) - ρ_{name←pName}(π_{pName}(Professor))
 var studentNamesThatDoNotMatchProfessorNames
-        = studentNames.differenced(professorNames) // ρ_{name←sName}(π_{sName}(Student)) - ρ_{name←pName}(π_{pName}(Professor))
+        = studentNames.differenced(professorNames)
 ```
 
 ### Intersection operator (R ∩ S)
@@ -94,6 +96,7 @@ This operator retains only matching tuples from both relations, eliminating dupl
 It is required that all attribute names must be the same in both relations.
 
 ```kotlin
+// ρ_{name←sName}(π_{sName}(Student)) ∩ ρ_{name←pName}(π_{pName}(Professor))
 var studentNamesThatMatchProfessorNames
-        = studentNames.intersection(professorNames) // ρ_{name←sName}(π_{sName}(Student)) ∩ ρ_{name←pName}(π_{pName}(Professor))
+        = studentNames.intersection(professorNames)
 ```
