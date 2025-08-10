@@ -3,11 +3,7 @@ package math.algebra.relational.dsl
 import math.algebra.relational.Relation
 import math.algebra.relational.Tuple
 
-fun relation(block: RelationBuilder.() -> Unit): Relation {
-    val builder = RelationBuilder()
-    builder.block()
-    return builder.build()
-}
+fun relation(block: RelationBuilder.() -> Unit): Relation = RelationBuilder().apply(block).build()
 
 class RelationBuilder {
     private lateinit var name: String
@@ -28,9 +24,7 @@ class RelationBuilder {
         tuples.addAll(tuplesBuilder.build())
     }
 
-    fun build(): Relation {
-        return Relation(name, attributes.toList(), tuples.map { Tuple(it) }.toList())
-    }
+    fun build(): Relation = Relation(name, attributes.toList(), tuples.map { Tuple(it) }.toList())
 }
 
 class TuplesBuilder {
@@ -40,17 +34,13 @@ class TuplesBuilder {
         tuplesList.add(values.toList())
     }
 
-    fun build(): List<List<Any>> {
-        return tuplesList
-    }
+    fun build(): List<List<Any>> = tuplesList
 }
 
 class ProjectionBuilder {
     private val attributes = mutableListOf<String>()
 
-    fun build(): List<String> {
-        return attributes
-    }
+    fun build(): List<String> = attributes
 
     fun attributes(vararg attributeNames: String) {
         attributes.addAll(attributeNames)
@@ -68,7 +58,5 @@ class RenameOperatorBuilder {
         renamedAttributes = attributeMapping.toMap()
     }
 
-    fun relation(newName: String) {
-        newRelationName = newName
-    }
+    fun relation(newName: String) { newRelationName = newName }
 }
